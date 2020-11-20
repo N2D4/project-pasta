@@ -443,16 +443,16 @@ MonoBehaviour:
   connectionOriginal: {fileID: 4410870635475433798, guid: de02ff3d9a0ee894095efb17cae3af67,
     type: 3}
   attachmentPoints:
-  - nodeIndex: 60
+  - nodeIndex: 30
     transform: {fileID: 798518155}
-  - nodeIndex: 140
+  - nodeIndex: 70
     transform: {fileID: 625387170}
   collidables:
   - {fileID: 159660526}
   - {fileID: 2109457686}
   resetNoodle: 0
   enableStepTime: 1
-  addConnetions: 1
+  addConnections: 1
 --- !u!4 &798518155
 Transform:
   m_ObjectHideFlags: 0

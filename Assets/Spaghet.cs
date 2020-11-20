@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
@@ -102,7 +103,7 @@ public class Spaghet : MonoBehaviour {
     public Collidable[] collidables;
     public bool resetNoodle = false;
     public bool enableStepTime = true;
-    public bool addConnetions = true;
+    public bool addConnections;
 
     private Dictionary<int, Transform> attachPoints;
     private List<NoodleNode> nodes;
@@ -110,24 +111,37 @@ public class Spaghet : MonoBehaviour {
 
     private float nodeMass {
         get {
-            return totalMass / nodeCount;
+            return totalMass / nodes.Count;
         }
     }
     private float springLength {
         get {
             if (keepLengthConstant) {
-                return totalLength / nodeCount;
+                return totalLength / nodes.Count;
             }
             return noodleRadius * 2;
         }
     }
 
+    private bool _connectionsActive;
+    private bool connectionsActive {
+        get {return _connectionsActive; }
+        set {
+            foreach (NoodleConnection connection in connections) {
+                connection.obj.SetActive(value);
+            }
+                _connectionsActive = value;
+        }
+    }
+
     void ResetNoodle() {
+        // AttachmentPoints
         attachPoints = new Dictionary<int, Transform>();
         foreach (var ap in attachmentPoints) {
             attachPoints[ap.nodeIndex] = ap.transform;
         }
 
+        // NoodleNodes
         if (nodes != null) {
             foreach (NoodleNode node in nodes) {
                 GameObject.Destroy(node.obj);
@@ -140,19 +154,18 @@ public class Spaghet : MonoBehaviour {
             nodes.Add(new NoodleNode(new Vector3(0, i, i), noodleRadius, obj));
         }
 
+        // NoodleConnections
         if (connections != null) {
             foreach (NoodleConnection connection in connections) {
                 GameObject.Destroy(connection.obj);
             }
         }
         connections = new List<NoodleConnection>();
-        if(addConnetions) {
-            for (int i = 0; i < nodeCount - 1; i++) {
-                GameObject obj = GameObject.Instantiate(connectionOriginal, gameObject.transform);
-                connections.Add(new NoodleConnection(nodes[i], nodes[i+1], obj));
-            }
+        for (int i = 0; i < nodes.Count - 1; i++) {
+            GameObject obj = GameObject.Instantiate(connectionOriginal, gameObject.transform);
+            connections.Add(new NoodleConnection(nodes[i], nodes[i+1], obj));
         }
-        
+        connectionsActive = true;
     }
 
     void Start() {
@@ -160,15 +173,19 @@ public class Spaghet : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        if (resetNoodle) {
+        if (resetNoodle || attachmentPoints == null || nodes == null || connections == null) {
+            foreach (Transform child in transform) {
+               Destroy(child.gameObject);
+            }
             ResetNoodle();
             resetNoodle = false;
         }
 
         // attachment points
         foreach (int key in attachPoints.Keys) {
-            NoodleNode node = nodes[key];
-            node.position = attachPoints[key].transform.position - gameObject.transform.position;
+            if (key < nodes.Count) {
+                nodes[key].position = attachPoints[key].transform.position - gameObject.transform.position;
+            }
         }
 
         // gravity
@@ -216,11 +233,23 @@ public class Spaghet : MonoBehaviour {
     }
 
     void Update() {
+        //Debug.Log("attachPoints.Count: " + attachPoints.Count + " | nodes.Count: " + nodes.Count + " | connections.Count: " + connections.Count);
         foreach (var node in nodes) {
             node.obj.transform.localPosition = node.position;
         }
-        foreach (NoodleConnection connection in connections){
-            connection.UpdateConnection();
+
+        if(!addConnections) {
+            if(connectionsActive) {
+                connectionsActive = false;
+            }
+        } 
+        else {
+            if (!connectionsActive) {
+                connectionsActive = true;
+            }
+            foreach (NoodleConnection connection in connections) {
+                connection.UpdateConnection();
+            }
         }
     }
 }

@@ -433,18 +433,19 @@ MonoBehaviour:
   springConstantContraction: 0.2
   springConstantExpansion: 0.2
   totalMass: 0.01
-  totalLength: 100
-  noodleRadius: 0.5
   damping: 0.9
+  noodleRadius: 0.25
+  keepLengthConstant: 1
+  totalLength: 100
   nodeCount: 100
   nodeOriginal: {fileID: 6479844013785498060, guid: 8f1ca536ccf974cecb41c959b144c9cb,
     type: 3}
   connectionOriginal: {fileID: 4410870635475433798, guid: de02ff3d9a0ee894095efb17cae3af67,
     type: 3}
   attachmentPoints:
-  - nodeIndex: 30
+  - nodeIndex: 60
     transform: {fileID: 798518155}
-  - nodeIndex: 70
+  - nodeIndex: 140
     transform: {fileID: 625387170}
   collidables:
   - {fileID: 159660526}

@@ -90,8 +90,8 @@ public class Spaghet : MonoBehaviour {
     public float gravity = 9.8065f;
     public float springConstantContraction = 0.01f;
     public float springConstantExpansion = 0.01f;
+    public float springLengthMultiplier = 1;
     public float totalMass = 0.01f;
-    public float totalLength = 10;
     public float noodleRadius = 0.5f;
     public float damping = 0.1f;
     public int nodeCount = 10;
@@ -114,7 +114,7 @@ public class Spaghet : MonoBehaviour {
     }
     private float springLength {
         get {
-            return totalLength / nodeCount;
+            return noodleRadius * 2 * springLengthMultiplier;
         }
     }
 

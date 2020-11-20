@@ -171,7 +171,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 18c7bcdc8748967458f41ee268128813, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -208,8 +208,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 159660525}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 27.52, y: 8.34, z: 4.95}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -64.1, y: -8.2, z: -0.5}
+  m_LocalScale: {x: 20, y: 20, z: 20}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -439,6 +439,8 @@ MonoBehaviour:
   nodeCount: 100
   nodeOriginal: {fileID: 6479844013785498060, guid: 8f1ca536ccf974cecb41c959b144c9cb,
     type: 3}
+  connectionOriginal: {fileID: 4410870635475433798, guid: de02ff3d9a0ee894095efb17cae3af67,
+    type: 3}
   attachmentPoints:
   - nodeIndex: 30
     transform: {fileID: 798518155}
@@ -449,6 +451,7 @@ MonoBehaviour:
   - {fileID: 2109457686}
   resetNoodle: 0
   enableStepTime: 1
+  addConnetions: 1
 --- !u!4 &798518155
 Transform:
   m_ObjectHideFlags: 0
@@ -649,8 +652,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2109457682}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.72387975, y: -10.3170805, z: -37.92}
-  m_LocalScale: {x: 8.55, y: 15.67, z: 1}
+  m_LocalPosition: {x: -0.72387975, y: -20.4, z: -37.92}
+  m_LocalScale: {x: 8.55, y: 32.17, z: 7.02}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5

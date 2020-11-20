@@ -50,11 +50,41 @@ public class NoodleNode {
     }
 }
 
+public class NoodleConnection {
+    /**
+     * Local position
+     */
+    public NoodleNode node1;
+    public NoodleNode node2;
+    public GameObject obj;
+    public Vector3 direction;
+    public float distance;
+    public float radius;
+
+    public NoodleConnection(NoodleNode node1, NoodleNode node2, GameObject obj) {
+        this.node1 = node1;
+        this.node2 = node2;
+        this.obj = obj;
+        UpdateConnection();
+    }
+
+    public void UpdateConnection() {
+        Vector3 v = node2.position - node1.position;
+        this.direction = v.normalized;
+        this.distance = v.magnitude;
+        this.radius = node1.radius;
+        obj.transform.localPosition = node1.position + direction * (distance / 2);
+        obj.transform.localRotation = Quaternion.FromToRotation(Vector3.up, direction);
+        obj.transform.localScale = new Vector3(radius * 2, distance / 2, radius * 2);
+    }
+}
+
 [Serializable]
 public struct AttachmentPoint {
     public int nodeIndex;
     public Transform transform;
 }
+
 
 public class Spaghet : MonoBehaviour {
     public float gravity = 9.8065f;
@@ -66,13 +96,16 @@ public class Spaghet : MonoBehaviour {
     public float damping = 0.1f;
     public int nodeCount = 10;
     public GameObject nodeOriginal;
+    public GameObject connectionOriginal;
     public AttachmentPoint[] attachmentPoints;
     public Collidable[] collidables;
     public bool resetNoodle = false;
     public bool enableStepTime = true;
+    public bool addConnetions = true;
 
     private Dictionary<int, Transform> attachPoints;
     private List<NoodleNode> nodes;
+    private List<NoodleConnection> connections;
 
     private float nodeMass {
         get {
@@ -99,8 +132,23 @@ public class Spaghet : MonoBehaviour {
         nodes = new List<NoodleNode>();
         for (int i = 0; i < nodeCount; i++) {
             GameObject obj = GameObject.Instantiate(nodeOriginal, gameObject.transform);
+            obj.transform.localScale = new Vector3(1, 1, 1) * noodleRadius * 2;
             nodes.Add(new NoodleNode(new Vector3(0, i, i), noodleRadius, obj));
         }
+
+        if (connections != null) {
+            foreach (NoodleConnection connection in connections) {
+                GameObject.Destroy(connection.obj);
+            }
+        }
+        connections = new List<NoodleConnection>();
+        if(addConnetions) {
+            for (int i = 0; i < nodeCount - 1; i++) {
+                GameObject obj = GameObject.Instantiate(connectionOriginal, gameObject.transform);
+                connections.Add(new NoodleConnection(nodes[i], nodes[i+1], obj));
+            }
+        }
+        
     }
 
     void Start() {
@@ -166,6 +214,9 @@ public class Spaghet : MonoBehaviour {
     void Update() {
         foreach (var node in nodes) {
             node.obj.transform.localPosition = node.position;
+        }
+        foreach (NoodleConnection connection in connections){
+            connection.UpdateConnection();
         }
     }
 }

@@ -51,7 +51,7 @@ public class BoxCollidable : Collidable
         if (tmpVector.x > tmpVector.y && tmpVector.x > tmpVector.z) {
             positionVector = new Vector3(Math.Sign(localVector.x) * (transform.localScale.x / 2 + noodleRadius), localVector.y, localVector.z);
             normalVector = new Vector3(Math.Sign(localVector.x), 0, 0);
-        } else if (tmpVector.x > tmpVector.z) {
+        } else if (tmpVector.y > tmpVector.z) {
             positionVector = new Vector3(localVector.x, Math.Sign(localVector.y) * (transform.localScale.y / 2 + noodleRadius), localVector.z);
             normalVector = new Vector3(0, Math.Sign(localVector.y), 0);
         } else {

@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1659682762799167589
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1659682762799167595}
+  - component: {fileID: 1659682762799167594}
+  m_Layer: 0
+  m_Name: Spaghet
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1659682762799167595
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659682762799167589}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.331736, y: -10.065537, z: -5.3844357}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1659682762799167594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659682762799167589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2292b57cc0e9644c89bc79495ded6ec5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravity: 100
+  springConstantContraction: 2
+  springConstantExpansion: 2
+  timeScale: 1
+  totalMass: 0.01
+  damping: 0.9
+  noodleRadius: 0.25
+  keepLengthConstant: 1
+  totalLength: 20
+  nodeCount: 20
+  nodeOriginal: {fileID: 6479844013785498060, guid: 8f1ca536ccf974cecb41c959b144c9cb,
+    type: 3}
+  connectionOriginal: {fileID: 4410870635475433798, guid: de02ff3d9a0ee894095efb17cae3af67,
+    type: 3}
+  attachmentPoints:
+  - nodeIndex: 0
+    transform: {fileID: 0}
+  collidables: []
+  resetNoodle: 0
+  enableStepTime: 1
+  addConnections: 1

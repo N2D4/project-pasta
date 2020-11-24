@@ -91,6 +91,7 @@ public class Spaghet : MonoBehaviour {
     public float gravity = 9.8065f;
     public float springConstantContraction = 0.01f;
     public float springConstantExpansion = 0.01f;
+    public float timeScale = 1f;
     public float totalMass = 0.01f;
     public float damping = 0.1f;
     public float noodleRadius = 0.5f;
@@ -214,13 +215,13 @@ public class Spaghet : MonoBehaviour {
 
         // apply damping
         foreach (var node in nodes) {
-            node.applyDamping(damping, Time.fixedDeltaTime);
+            node.applyDamping(damping, Time.fixedDeltaTime * timeScale);
         }
 
         // step time
         if (enableStepTime) {
             foreach (var node in nodes) {
-                node.stepTime(Time.fixedDeltaTime);
+                node.stepTime(Time.fixedDeltaTime * timeScale);
             }
         }
 

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class SphereCollidable : Collidable {
     public float radius = 1;
+    public float elasticity = 0.8f;
     public Collidable[] collidables;
 
     void Start() {
@@ -19,7 +20,7 @@ public class SphereCollidable : Collidable {
     public override void FixedUpdate() {
         base.FixedUpdate();
         foreach (var collidable in collidables) {
-            (transform.position, this.velocity) = collidable.collideWith(transform.position, this.velocity, this.mass, this.radius, 1);
+            (transform.position, this.velocity) = collidable.collideWith(transform.position, this.velocity, this.mass, this.radius, elasticity);
         }
     }
 

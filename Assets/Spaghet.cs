@@ -244,11 +244,30 @@ public class Spaghet : MonoBehaviour {
             }
         }
 
+        // update bounding sphere
+        Vector3 boundingBoxMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        Vector3 boundingBoxMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+        foreach (var node in nodes) {
+            boundingBoxMin = new Vector3(
+                Mathf.Min(boundingBoxMin.x, node.position.x),
+                Mathf.Min(boundingBoxMin.y, node.position.y),
+                Mathf.Min(boundingBoxMin.z, node.position.z)
+            );
+            boundingBoxMax = new Vector3(
+                Mathf.Max(boundingBoxMax.x, node.position.x),
+                Mathf.Max(boundingBoxMax.y, node.position.y),
+                Mathf.Max(boundingBoxMax.z, node.position.z)
+            );
+        }
+        BoundingSphere boundingSphere = new BoundingSphere((boundingBoxMin + boundingBoxMax) / 2, (boundingBoxMin - boundingBoxMax).magnitude / 2);
+
         // collision
-        for (int i = 0; i < nodes.Count; i++) {
-            if (!attachPoints.ContainsKey(i)) {
-                foreach (var collidable in collidables) {
-                    nodes[i].collideWith(transform.position, collidable);
+        foreach (var collidable in collidables) {
+            if (collidable.CheckSphereCollision(boundingSphere.position, boundingSphere.radius)) {
+                for (int i = 0; i < nodes.Count; i++) {
+                    if (!attachPoints.ContainsKey(i)) {
+                        nodes[i].collideWith(transform.position, collidable);
+                    }
                 }
             }
         }

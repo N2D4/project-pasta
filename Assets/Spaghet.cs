@@ -12,11 +12,13 @@ public class NoodleNode {
     public Vector3 velocity;
     private Vector3 accel;
     public GameObject obj;
+    public float mass;
 
-    public NoodleNode(Vector3 position, float radius, GameObject obj) {
+    public NoodleNode(Vector3 position, float radius, GameObject obj, float mass) {
         this.position = position;
         this.radius = radius;
         this.obj = obj;
+        this.mass = mass;
         this.velocity = new Vector3();
         this.accel = new Vector3();
     }
@@ -41,13 +43,10 @@ public class NoodleNode {
     }
 
     public void collideWith(Vector3 parentPos, Collidable collidable) {
-        Vector3 pos = parentPos + position;
-        if (!collidable.CheckNoodleCollision(pos, radius)) {
-            return;
-        }
-        Tuple<Vector3, Vector3> collisionResponse = collidable.NoodleCollisionResponse(pos, radius);
-        this.position = collisionResponse.Item1 - parentPos;
-        this.velocity = Vector3.ProjectOnPlane(this.velocity, collisionResponse.Item2);
+        Vector3 pos = parentPos + this.position;
+        var (newPos, newVel) = collidable.collideWith(pos, this.velocity, this.mass, this.radius, 0);
+        this.position = newPos - parentPos;
+        this.velocity = newVel;
     }
 }
 
@@ -91,6 +90,9 @@ public class Spaghet : MonoBehaviour {
     public float gravity = 9.8065f;
     public float springConstantContraction = 0.01f;
     public float springConstantExpansion = 0.01f;
+    public float curvatureConstantContraction = 0f;
+    public float curvatureConstantExpansion = 0.005f;
+    public float targetCurvature = 1.9f;
     public float timeScale = 1f;
     public float totalMass = 0.01f;
     public float damping = 0.1f;
@@ -152,7 +154,7 @@ public class Spaghet : MonoBehaviour {
         for (int i = 0; i < nodeCount; i++) {
             GameObject obj = GameObject.Instantiate(nodeOriginal, gameObject.transform);
             obj.transform.localScale = new Vector3(1, 1, 1) * noodleRadius * 2;
-            nodes.Add(new NoodleNode(new Vector3(0, i, i), noodleRadius, obj));
+            nodes.Add(new NoodleNode(new Vector3(0, i, i), noodleRadius, obj, nodeMass));
         }
 
         // NoodleConnections
@@ -203,12 +205,29 @@ public class Spaghet : MonoBehaviour {
 
             Vector3 dif = n2.position - n1.position;
             float forceFac = (dif.magnitude - springLength) / dif.magnitude;
-            Vector3 force = dif * forceFac * (forceFac >= 0 ? springConstantExpansion : springConstantContraction);
+            Vector3 force = dif * forceFac * (forceFac >= 0 ? springConstantContraction : springConstantExpansion);
             
             if (!attachPoints.ContainsKey(i)) {
                 n1.addAcceleration(force / nodeMass);
             }
             if (!attachPoints.ContainsKey(i+1)) {
+                n2.addAcceleration(- force / nodeMass);
+            }
+        }
+
+        // curvature force
+        for (int i = 0; i < nodes.Count - 2; i++) {
+            NoodleNode n1 = nodes[i];
+            NoodleNode n2 = nodes[i+2];
+
+            Vector3 dif = n2.position - n1.position;
+            float forceFac = (dif.magnitude - targetCurvature * springLength) / dif.magnitude;
+            Vector3 force = dif * forceFac * (forceFac >= 0 ? curvatureConstantContraction : curvatureConstantExpansion);
+            
+            if (!attachPoints.ContainsKey(i)) {
+                n1.addAcceleration(force / nodeMass);
+            }
+            if (!attachPoints.ContainsKey(i+2)) {
                 n2.addAcceleration(- force / nodeMass);
             }
         }
@@ -225,10 +244,12 @@ public class Spaghet : MonoBehaviour {
             }
         }
 
-        // collisions
-        foreach (var node in nodes) {
-            foreach (var collidable in collidables) {
-                node.collideWith(transform.position, collidable);
+        // collision
+        for (int i = 0; i < nodes.Count; i++) {
+            if (!attachPoints.ContainsKey(i)) {
+                foreach (var collidable in collidables) {
+                    nodes[i].collideWith(transform.position, collidable);
+                }
             }
         }
     }

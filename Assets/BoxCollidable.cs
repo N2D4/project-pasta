@@ -15,53 +15,80 @@ public class BoxCollidable : Collidable
         
     }
 
-    public override bool CheckNoodleCollision(Vector3 noodleCenter, float noodleRadius) {
-        Vector3 localVector = transform.InverseTransformPoint(noodleCenter);
-        Vector3 directionToNoodle = noodleCenter - transform.position;
+    private static float TowardsZero(float a, float b) {
+        return Mathf.Max(Mathf.Abs(a) - b, 0) * Mathf.Sign(a);
+    }
 
+    private static float CapAt(float a, float b) {
+        return Mathf.Min(Mathf.Abs(a), b) * Mathf.Sign(a);
+    }
+
+    private (Vector3, Vector3) DecomposeVector(Vector3 localVector) {
+        return (
+            new Vector3(
+                CapAt(localVector.x, transform.localScale.x / 2),
+                CapAt(localVector.y, transform.localScale.y / 2),
+                CapAt(localVector.z, transform.localScale.z / 2)
+            ),
+            new Vector3(
+                TowardsZero(localVector.x, transform.localScale.x / 2),
+                TowardsZero(localVector.y, transform.localScale.y / 2),
+                TowardsZero(localVector.z, transform.localScale.z / 2)
+            )
+        );
+    }
+
+    private static float sq(float f) {
+        return f * f;
+    }
+
+    public override bool CheckSphereCollision(Vector3 center, float radius) {
+        Vector3 localVector = transform.InverseTransformPoint(center);
         localVector.x = localVector.x * transform.localScale.x;
         localVector.y = localVector.y * transform.localScale.y;
         localVector.z = localVector.z * transform.localScale.z;
 
-        bool pointInBigBox = (
-            localVector.x >= -0.5 * transform.localScale.x -noodleRadius && localVector.x <= 0.5 * transform.localScale.x  + noodleRadius &&
-            localVector.y >= -0.5 * transform.localScale.y -noodleRadius && localVector.y <= 0.5 * transform.localScale.y  + noodleRadius &&
-            localVector.z >= -0.5 * transform.localScale.z -noodleRadius && localVector.z <= 0.5 * transform.localScale.z  + noodleRadius);
+        Vector3 collapsedVector = new Vector3(
+            Mathf.Max(Mathf.Abs(localVector.x) - transform.localScale.x / 2, 0),
+            Mathf.Max(Mathf.Abs(localVector.y) - transform.localScale.y / 2, 0),
+            Mathf.Max(Mathf.Abs(localVector.z) - transform.localScale.z / 2, 0)
+        );
 
-        if (!pointInBigBox){
-            return false;
-        }
-
-        // Add more cases if necessary
-
-        return true;
+        return collapsedVector.sqrMagnitude <= sq(radius);
     }
 
-    public override Tuple<Vector3, Vector3> NoodleCollisionResponse(Vector3 noodleCenter, float noodleRadius) {
-        Vector3 directionVector = noodleCenter - transform.position;
-        Vector3 localVector = transform.InverseTransformDirection(directionVector);
-
-        Vector3 normalVector;
-        Vector3 positionVector;
-        Vector3 tmpVector = new Vector3(
-            Math.Abs(localVector.x / transform.localScale.x),
-            Math.Abs(localVector.y / transform.localScale.y),
-            Math.Abs(localVector.z / transform.localScale.z)
-        );
-        if (tmpVector.x > tmpVector.y && tmpVector.x > tmpVector.z) {
-            positionVector = new Vector3(Math.Sign(localVector.x) * (transform.localScale.x / 2 + noodleRadius), localVector.y, localVector.z);
-            normalVector = new Vector3(Math.Sign(localVector.x), 0, 0);
-        } else if (tmpVector.y > tmpVector.z) {
-            positionVector = new Vector3(localVector.x, Math.Sign(localVector.y) * (transform.localScale.y / 2 + noodleRadius), localVector.z);
-            normalVector = new Vector3(0, Math.Sign(localVector.y), 0);
-        } else {
-            positionVector = new Vector3(localVector.x, localVector.y, Math.Sign(localVector.z) * (transform.localScale.z / 2 + noodleRadius));
-            normalVector = new Vector3(0, 0, Math.Sign(localVector.z));
-        }
+    public override (Vector3, Vector3) SphereCollisionResponse(Vector3 center, float radius) {
+        Vector3 localVector = transform.InverseTransformPoint(center);
+        localVector.x = localVector.x * transform.localScale.x;
+        localVector.y = localVector.y * transform.localScale.y;
+        localVector.z = localVector.z * transform.localScale.z;
         
-        return new Tuple<Vector3, Vector3>(
-            transform.position + transform.TransformDirection(positionVector),
-            transform.position + transform.TransformDirection(normalVector)
+        (Vector3, Vector3) decomposed = DecomposeVector(localVector);
+        if ((decomposed.Item1 + decomposed.Item2 - localVector).sqrMagnitude > 0.0000001) {
+            throw new Exception("Vectors not equal! " + decomposed + " " + localVector);
+        }
+
+        Vector3 normalVector = decomposed.Item2;
+        if (normalVector.sqrMagnitude < 0.000001) {
+            normalVector = decomposed.Item1; // TODO fix
+        }
+        normalVector.Normalize();
+
+        Vector3 newBoxOffset = decomposed.Item1 * Mathf.Min(
+            Mathf.Abs(transform.localScale.x / 2 / decomposed.Item1.x),
+            Mathf.Abs(transform.localScale.y / 2 / decomposed.Item1.y),
+            Mathf.Abs(transform.localScale.z / 2 / decomposed.Item1.z)
+        );
+        Vector3 newEdgeOffset = normalVector * radius;
+        Vector3 newOffset = newBoxOffset + newEdgeOffset;
+
+        return (
+            transform.TransformPoint(new Vector3(
+                newOffset.x / transform.localScale.x,
+                newOffset.y / transform.localScale.y,
+                newOffset.z / transform.localScale.z
+            )),
+            transform.TransformDirection(normalVector)
         );
     }
 }

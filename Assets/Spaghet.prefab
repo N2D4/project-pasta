@@ -46,6 +46,9 @@ MonoBehaviour:
   gravity: 100
   springConstantContraction: 2
   springConstantExpansion: 2
+  curvatureConstantContraction: 0
+  curvatureConstantExpansion: 1
+  targetCurvature: 1.9
   timeScale: 1
   totalMass: 0.01
   damping: 0.9
